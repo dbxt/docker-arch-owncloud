@@ -1,7 +1,7 @@
 FROM l3iggs/lamp
 MAINTAINER l3iggs <l3iggs@live.com>
-# Report issues here: https://github.com/l3iggs/docker-owncloud/issues
-# Say thanks by adding a star or a comment here: https://registry.hub.docker.com/u/l3iggs/owncloud/
+# Report issues here: https://github.com/l3iggs/docker-owncloud/issues 
+# Say thanks by adding a star or a comment here: https://registry.hub.docker.com/u/l3iggs/owncloud/ 
 
 # upldate package list
 RUN pacman -Sy
@@ -12,6 +12,7 @@ ENV START_APACHE true
 ENV START_MYSQL true
 ENV MAX_UPLOAD_SIZE 30G
 ENV TARGET_SUBDIR owncloud
+ENV OC_VERSION '*'
 
 # remove info.php
 RUN rm /srv/http/info.php
@@ -29,12 +30,14 @@ RUN pacman -S --noconfirm --needed ffmpeg
 RUN pacman -S --noconfirm --needed libreoffice-fresh
 
 # Install owncloud
-RUN pacman -S --noconfirm --needed owncloud
+RUN pacman -Sw --noconfirm --needed owncloud
+RUN pacman -U --noconfirm --needed /var/cache/pacman/pkg/owncloud-${OC_VERSION}-any.pkg.tar.xz
+
 # add our custom config.php
 ADD configs/oc-config.php /usr/share/webapps/owncloud/config/config.php
 
 # fixup the permissions (because appairently the package maintainer can't get it right)
-ADD fixPerms.sh /root/fixPerms.sh
+ADD scripts/fixPerms.sh /root/fixPerms.sh
 RUN chmod +x /root/fixPerms.sh
 RUN /root/fixPerms.sh
 
